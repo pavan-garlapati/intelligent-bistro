@@ -1,0 +1,214 @@
+{
+  "items": [
+    {
+      "id": "truffle-arancini",
+      "name": "Truffle Arancini",
+      "description": "Golden, crispy risotto spheres with molten taleggio centers, finished with shaved black truffle and warm parmesan cream.",
+      "price": 14.00,
+      "category": "Starters",
+      "tags": ["Popular"],
+      "emoji": "🍙",
+      "available": true
+    },
+    {
+      "id": "spicy-chicken-wings",
+      "name": "Spicy Korean Chicken Wings",
+      "description": "Double-fried wings glazed in fiery gochujang honey, scattered with toasted sesame and fresh scallion.",
+      "price": 13.50,
+      "category": "Starters",
+      "tags": ["Spicy", "Popular"],
+      "emoji": "🍗",
+      "available": true
+    },
+    {
+      "id": "burrata-bruschetta",
+      "name": "Burrata Bruschetta",
+      "description": "Creamy hand-pulled burrata over charred sourdough with heirloom tomatoes, basil oil, and aged balsamic.",
+      "price": 12.50,
+      "category": "Starters",
+      "tags": [],
+      "emoji": "🍅",
+      "available": true
+    },
+    {
+      "id": "crispy-calamari",
+      "name": "Crispy Calamari",
+      "description": "Lightly battered calamari fried until shatter-crisp, served with smoked paprika aioli and a squeeze of lemon.",
+      "price": 13.00,
+      "category": "Starters",
+      "tags": [],
+      "emoji": "🦑",
+      "available": true
+    },
+    {
+      "id": "soup-of-the-day",
+      "name": "Soup of the Day",
+      "description": "Chef's daily creation, simmered slowly from seasonal vegetables and finished with herb oil and crusty bread.",
+      "price": 9.00,
+      "category": "Starters",
+      "tags": ["Vegan"],
+      "emoji": "🍲",
+      "available": true
+    },
+    {
+      "id": "wild-mushroom-risotto",
+      "name": "Wild Mushroom Risotto",
+      "description": "Slow-stirred carnaroli rice with porcini, chanterelles, and shiitake, finished with mascarpone and thyme.",
+      "price": 22.00,
+      "category": "Mains",
+      "tags": ["Gluten-free"],
+      "emoji": "🍄",
+      "available": true
+    },
+    {
+      "id": "grilled-salmon",
+      "name": "Cedar-Grilled Salmon",
+      "description": "Faroe Island salmon grilled over cedar, glazed with miso-maple, served on charred bok choy and jasmine rice.",
+      "price": 28.00,
+      "category": "Mains",
+      "tags": ["Popular", "Gluten-free"],
+      "emoji": "🐟",
+      "available": true
+    },
+    {
+      "id": "wagyu-beef-burger",
+      "name": "Wagyu Beef Burger",
+      "description": "Eight ounces of American wagyu on a toasted brioche bun with aged cheddar, caramelized onion jam, and truffle fries.",
+      "price": 26.00,
+      "category": "Mains",
+      "tags": ["Popular"],
+      "emoji": "🍔",
+      "available": true
+    },
+    {
+      "id": "margherita-pizza",
+      "name": "Margherita Pizza",
+      "description": "Wood-fired Neapolitan crust with San Marzano tomato, hand-torn fior di latte, and a flourish of basil and olive oil.",
+      "price": 18.00,
+      "category": "Mains",
+      "tags": [],
+      "emoji": "🍕",
+      "available": true
+    },
+    {
+      "id": "chicken-shawarma-wrap",
+      "name": "Chicken Shawarma Wrap",
+      "description": "Spit-roasted chicken with garlic toum, pickled turnip, and crispy shoestring fries wrapped in warm saj bread.",
+      "price": 16.00,
+      "category": "Mains",
+      "tags": [],
+      "emoji": "🌯",
+      "available": true
+    },
+    {
+      "id": "pasta-carbonara",
+      "name": "Pasta Carbonara",
+      "description": "Hand-rolled tonnarelli tossed with guanciale, pecorino romano, and silky egg yolk, cracked with black pepper.",
+      "price": 21.00,
+      "category": "Mains",
+      "tags": ["Popular"],
+      "emoji": "🍝",
+      "available": true
+    },
+    {
+      "id": "vegan-buddha-bowl",
+      "name": "Vegan Buddha Bowl",
+      "description": "Turmeric quinoa, roasted sweet potato, charred broccolini, avocado, and crispy chickpeas with tahini-lemon dressing.",
+      "price": 17.00,
+      "category": "Mains",
+      "tags": ["Vegan", "Gluten-free"],
+      "emoji": "🥗",
+      "available": true
+    },
+    {
+      "id": "sparkling-water-small",
+      "name": "Sparkling Water (Small)",
+      "description": "Crisp Italian mineral water with fine, lively bubbles served chilled with citrus.",
+      "price": 4.00,
+      "category": "Drinks",
+      "tags": ["Vegan", "Gluten-free"],
+      "emoji": "💧",
+      "available": true
+    },
+    {
+      "id": "sparkling-water-large",
+      "name": "Sparkling Water (Large)",
+      "description": "A 750ml bottle of crisp Italian mineral water, perfect for sharing across the table.",
+      "price": 7.00,
+      "category": "Drinks",
+      "tags": ["Vegan", "Gluten-free"],
+      "emoji": "💧",
+      "available": true
+    },
+    {
+      "id": "fresh-lemonade",
+      "name": "Fresh-Pressed Lemonade",
+      "description": "Hand-squeezed Meyer lemons with cane sugar and a whisper of muddled mint, served over crushed ice.",
+      "price": 6.00,
+      "category": "Drinks",
+      "tags": ["Vegan"],
+      "emoji": "🍋",
+      "available": true
+    },
+    {
+      "id": "iced-matcha-latte",
+      "name": "Iced Matcha Latte",
+      "description": "Stone-ground ceremonial-grade matcha whisked with cold oat milk and a touch of vanilla, poured over ice.",
+      "price": 6.50,
+      "category": "Drinks",
+      "tags": ["Vegan", "Popular"],
+      "emoji": "🍵",
+      "available": true
+    },
+    {
+      "id": "house-red-wine",
+      "name": "House Red Wine",
+      "description": "A medium-bodied Tuscan sangiovese with notes of cherry, leather, and dried herbs, by the glass.",
+      "price": 11.00,
+      "category": "Drinks",
+      "tags": [],
+      "emoji": "🍷",
+      "available": true
+    },
+    {
+      "id": "tiramisu",
+      "name": "Classic Tiramisu",
+      "description": "Espresso-soaked savoiardi layered with airy mascarpone cream and a generous dusting of bitter cocoa.",
+      "price": 10.00,
+      "category": "Desserts",
+      "tags": ["Popular"],
+      "emoji": "🍰",
+      "available": true
+    },
+    {
+      "id": "chocolate-fondant",
+      "name": "Warm Chocolate Fondant",
+      "description": "Dark Valrhona chocolate cake with a molten center, paired with salted caramel gelato and toasted hazelnuts.",
+      "price": 11.00,
+      "category": "Desserts",
+      "tags": ["Popular"],
+      "emoji": "🍫",
+      "available": true
+    },
+    {
+      "id": "artisan-gelato",
+      "name": "Artisan Gelato",
+      "description": "Three scoops of house-churned gelato — pistachio, stracciatella, and Madagascar vanilla — with candied almonds.",
+      "price": 9.00,
+      "category": "Desserts",
+      "tags": ["Gluten-free"],
+      "emoji": "🍨",
+      "available": true
+    },
+    {
+      "id": "new-york-cheesecake",
+      "name": "New York Cheesecake",
+      "description": "Velvety vanilla bean cheesecake on a buttery graham crust, topped with macerated summer berries.",
+      "price": 10.00,
+      "category": "Desserts",
+      "tags": [],
+      "emoji": "🍰",
+      "available": true
+    }
+  ]
+}
