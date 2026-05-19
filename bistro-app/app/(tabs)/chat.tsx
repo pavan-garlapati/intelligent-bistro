@@ -21,7 +21,11 @@ import Animated, {
 
 import { useChatStore } from '../../store/chatStore';
 import { useCartStore } from '../../store/cartStore';
-import { sendChatMessage as apiSendChatMessage } from '../../services/api';
+import {
+  NETWORK_ERROR_MESSAGE,
+  sendChatMessage as apiSendChatMessage,
+} from '../../services/api';
+import { useToast } from '../../components/ui/ToastProvider';
 import { MessageBubble } from '../../components/chat/MessageBubble';
 import { VoiceOverlay } from '../../components/chat/VoiceOverlay';
 import { LoadingDots } from '../../components/ui/LoadingDots';
@@ -118,7 +122,12 @@ export default function ChatScreen() {
   const syncCart = useCartStore((s) => s.syncCart);
 
   const [inputText, setInputText] = useState('');
+  const [lastFailedMessage, setLastFailedMessage] = useState<string | null>(
+    null,
+  );
   const listRef = useRef<FlatList<Message>>(null);
+
+  const { showToast } = useToast();
 
   const voice = useVoiceInput({
     onTranscriptReady: (text) => {
@@ -176,7 +185,13 @@ export default function ChatScreen() {
       if (Array.isArray(res.updatedCart)) {
         syncCart(res.updatedCart);
       }
-    } catch {
+      setLastFailedMessage(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '';
+      if (message === NETWORK_ERROR_MESSAGE) {
+        setLastFailedMessage(trimmed);
+        showToast('No internet connection', '📡');
+      }
       addMessage({
         role: 'assistant',
         content:
@@ -206,10 +221,23 @@ export default function ChatScreen() {
   const lastAssistant = [...messages]
     .reverse()
     .find((m) => m.role === 'assistant');
-  const activeSuggestions =
+  const baseSuggestions =
     lastAssistant?.suggestions && lastAssistant.suggestions.length > 0
       ? lastAssistant.suggestions
       : DEFAULT_SUGGESTIONS;
+  const activeSuggestions = lastFailedMessage
+    ? ['Retry', ...baseSuggestions]
+    : baseSuggestions;
+
+  const handleChipPress = (label: string) => {
+    if (label === 'Retry' && lastFailedMessage) {
+      const toRetry = lastFailedMessage;
+      setLastFailedMessage(null);
+      sendMessage(toRetry);
+      return;
+    }
+    sendMessage(label);
+  };
 
   return (
     <View className="flex-1 bg-brand-cream">
@@ -219,7 +247,7 @@ export default function ChatScreen() {
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
       >
         {messages.length === 0 ? (
@@ -258,7 +286,7 @@ export default function ChatScreen() {
                 <SuggestionChip
                   key={s}
                   label={s}
-                  onPress={() => sendMessage(s)}
+                  onPress={() => handleChipPress(s)}
                 />
               ))}
             </ScrollView>

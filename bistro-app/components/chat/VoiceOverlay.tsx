@@ -63,15 +63,16 @@ function PulsingRing({
 }
 
 function WaveformBar({ delay }: { delay: number }) {
-  const height = useSharedValue(8);
+  const height = useSharedValue(4);
 
   useEffect(() => {
+    const peak = 12 + Math.random() * 8;
     height.value = withDelay(
       delay,
       withRepeat(
         withSequence(
-          withTiming(28 + Math.random() * 8, { duration: 420 }),
-          withTiming(6 + Math.random() * 6, { duration: 420 }),
+          withTiming(peak, { duration: 300 }),
+          withTiming(4, { duration: 300 }),
         ),
         -1,
         true,
@@ -89,14 +90,14 @@ function WaveformBar({ delay }: { delay: number }) {
           width: 4,
           marginHorizontal: 3,
           borderRadius: 2,
-          backgroundColor: '#b85c28',
+          backgroundColor: 'rgba(255,255,255,0.7)',
         },
       ]}
     />
   );
 }
 
-const BAR_DELAYS = [0, 90, 180, 60, 220, 140, 200, 50];
+const BAR_DELAYS = [0, 80, 160, 240, 320, 400, 480, 560];
 
 export function VoiceOverlay({
   visible,

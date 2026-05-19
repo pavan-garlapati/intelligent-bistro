@@ -1,10 +1,11 @@
 import { useEffect, useRef } from 'react';
-import { Text } from 'react-native';
 import Animated, {
+  interpolateColor,
   useAnimatedStyle,
   useSharedValue,
   withSequence,
   withSpring,
+  withTiming,
 } from 'react-native-reanimated';
 
 export interface CartBadgeProps {
@@ -13,28 +14,51 @@ export interface CartBadgeProps {
 
 export function CartBadge({ count }: CartBadgeProps) {
   const scale = useSharedValue(1);
+  const flash = useSharedValue(0);
   const prevCount = useRef(count);
 
   useEffect(() => {
     if (count > prevCount.current) {
       scale.value = withSequence(
-        withSpring(1.35, { damping: 6, stiffness: 220 }),
+        withSpring(1.4, { damping: 6, stiffness: 220 }),
         withSpring(1, { damping: 10, stiffness: 200 }),
+      );
+      flash.value = withSequence(
+        withTiming(1, { duration: 130 }),
+        withTiming(0, { duration: 170 }),
       );
     }
     prevCount.current = count;
-  }, [count, scale]);
+  }, [count, scale, flash]);
 
-  const animatedStyle = useAnimatedStyle(() => ({
+  const containerStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
+    backgroundColor: interpolateColor(
+      flash.value,
+      [0, 1],
+      ['#b85c28', '#ffffff'],
+    ),
+  }));
+
+  const textStyle = useAnimatedStyle(() => ({
+    color: interpolateColor(
+      flash.value,
+      [0, 1],
+      ['#ffffff', '#b85c28'],
+    ),
   }));
 
   return (
     <Animated.View
-      style={animatedStyle}
-      className="min-w-[20px] h-5 px-1.5 rounded-full bg-brand-primary items-center justify-center"
+      style={containerStyle}
+      className="min-w-[20px] h-5 px-1.5 rounded-full items-center justify-center"
     >
-      <Text className="text-white text-[11px] font-bold">{count}</Text>
+      <Animated.Text
+        style={textStyle}
+        className="text-[11px] font-bold"
+      >
+        {count}
+      </Animated.Text>
     </Animated.View>
   );
 }

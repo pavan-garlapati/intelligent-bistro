@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Pressable,
   ScrollView,
   Text,
   View,
   useWindowDimensions,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -218,8 +220,14 @@ export default function CartScreen() {
   const clearCart = useCartStore((s) => s.clearCart);
 
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isPlacing, setIsPlacing] = useState(false);
+  const placeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
+  const subtitleCount =
+    itemCount === 0
+      ? 'Empty'
+      : `${itemCount} ${itemCount === 1 ? 'item' : 'items'}`;
 
   const handleIncrease = (item: CartItem) => {
     const nextQty = item.quantity + 1;
@@ -238,12 +246,22 @@ export default function CartScreen() {
   };
 
   const handleRemove = (item: CartItem) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
     removeItem(item.itemId);
     apiRemoveFromCart(sessionId, item.itemId).catch(() => {});
   };
 
   const handlePlaceOrder = () => {
-    setShowSuccess(true);
+    if (isPlacing) return;
+    setIsPlacing(true);
+    if (placeTimer.current) clearTimeout(placeTimer.current);
+    placeTimer.current = setTimeout(() => {
+      setIsPlacing(false);
+      setShowSuccess(true);
+      Haptics.notificationAsync(
+        Haptics.NotificationFeedbackType.Success,
+      ).catch(() => {});
+    }, 700);
   };
 
   const handleOrderAgain = () => {
@@ -262,7 +280,7 @@ export default function CartScreen() {
             Your order
           </Text>
           <Text className="text-brand-muted text-[12px] mt-0.5">
-            {itemCount} {itemCount === 1 ? 'item' : 'items'} · Table 7
+            {subtitleCount} · Table 7
           </Text>
         </View>
       </SafeAreaView>
@@ -314,11 +332,18 @@ export default function CartScreen() {
 
             <Pressable
               onPress={handlePlaceOrder}
-              className="w-full h-[52px] bg-brand-primary rounded-2xl items-center justify-center"
+              disabled={isPlacing}
+              className={`w-full h-[52px] rounded-2xl items-center justify-center bg-brand-primary ${
+                isPlacing ? 'opacity-80' : ''
+              }`}
             >
-              <Text className="text-brand-cream text-[16px] font-bold">
-                Place order — ${total.toFixed(2)}
-              </Text>
+              {isPlacing ? (
+                <ActivityIndicator color="#fdf6ee" />
+              ) : (
+                <Text className="text-brand-cream text-[16px] font-bold">
+                  Place order — ${total.toFixed(2)}
+                </Text>
+              )}
             </Pressable>
           </View>
         </>

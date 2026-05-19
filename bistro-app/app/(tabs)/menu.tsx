@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import * as Haptics from 'expo-haptics';
 import {
   Pressable,
   ScrollView,
@@ -25,7 +26,7 @@ import { MenuItemCard } from '../../components/menu/MenuItemCard';
 import { CategoryHeader } from '../../components/menu/CategoryHeader';
 import { ItemDetailSheet } from '../../components/menu/ItemDetailSheet';
 import { CartBadge } from '../../components/ui/CartBadge';
-import { Toast } from '../../components/ui/Toast';
+import { useToast } from '../../components/ui/ToastProvider';
 import type { Category, MenuItem } from '../../types';
 
 const PILL_OPTIONS = ['All', 'Starters', 'Mains', 'Drinks', 'Desserts'] as const;
@@ -49,7 +50,7 @@ function SkeletonCard() {
   useEffect(() => {
     opacity.value = withRepeat(
       withSequence(
-        withTiming(0.9, { duration: 700 }),
+        withTiming(0.8, { duration: 700 }),
         withTiming(0.4, { duration: 700 }),
       ),
       -1,
@@ -88,20 +89,13 @@ export default function MenuScreen() {
   const [selectedPill, setSelectedPill] = useState<PillOption>('All');
   const [searchText, setSearchText] = useState('');
   const [sheetItem, setSheetItem] = useState<MenuItem | null>(null);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (items.length === 0 && !isLoading) {
       fetchMenu();
     }
   }, [items.length, isLoading, fetchMenu]);
-
-  useEffect(() => {
-    return () => {
-      if (toastTimer.current) clearTimeout(toastTimer.current);
-    };
-  }, []);
 
   const cartCount = useMemo(
     () => cartItems.reduce((sum, i) => sum + i.quantity, 0),
@@ -123,12 +117,6 @@ export default function MenuScreen() {
       .filter((s) => s.data.length > 0);
   }, [grouped, selectedPill, searchText]);
 
-  const showToast = (message: string) => {
-    setToastMessage(message);
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToastMessage(null), 1500);
-  };
-
   const handleAdd = (item: MenuItem, quantity: number) => {
     addItemToCart({
       itemId: item.id,
@@ -137,7 +125,8 @@ export default function MenuScreen() {
       quantity,
       emoji: item.emoji,
     });
-    showToast(`${item.emoji} Added to order`);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    showToast('Added to order', item.emoji);
   };
 
   const showSkeleton = isLoading && items.length === 0;
@@ -289,7 +278,6 @@ export default function MenuScreen() {
         onClose={() => setSheetItem(null)}
         onAdd={handleAdd}
       />
-      <Toast visible={toastMessage !== null} message={toastMessage ?? ''} />
     </View>
   );
 }

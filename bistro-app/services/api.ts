@@ -7,6 +7,18 @@ import type {
 const BASE_URL =
   process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3001/api';
 
+export const NETWORK_ERROR_MESSAGE = 'No internet connection';
+
+function isOfflineError(err: unknown): boolean {
+  if (!(err instanceof TypeError)) return false;
+  const msg = err.message.toLowerCase();
+  return (
+    msg.includes('network request failed') ||
+    msg.includes('failed to fetch') ||
+    msg.includes('network error')
+  );
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let res: Response;
   try {
@@ -18,6 +30,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       },
     });
   } catch (err) {
+    if (isOfflineError(err)) {
+      throw new Error(NETWORK_ERROR_MESSAGE);
+    }
     const reason = err instanceof Error ? err.message : 'Unknown network error';
     throw new Error(`Network error: ${reason}`);
   }

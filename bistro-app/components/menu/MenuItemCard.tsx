@@ -3,7 +3,9 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
+  withSequence,
   withSpring,
+  withTiming,
 } from 'react-native-reanimated';
 import type { MenuItem } from '../../types';
 import { Tag, tagVariantFor } from '../ui/Tag';
@@ -16,25 +18,51 @@ export interface MenuItemCardProps {
 }
 
 export function MenuItemCard({ item, onAdd, onPress }: MenuItemCardProps) {
-  const scale = useSharedValue(1);
+  const cardScale = useSharedValue(1);
+  const plusRotation = useSharedValue(0);
+  const floatY = useSharedValue(0);
+  const floatOpacity = useSharedValue(0);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
+  const cardStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: cardScale.value }],
   }));
+
+  const plusStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${plusRotation.value}deg` }],
+  }));
+
+  const floatStyle = useAnimatedStyle(() => ({
+    opacity: floatOpacity.value,
+    transform: [{ translateY: floatY.value }],
+  }));
+
+  const handlePlusPress = () => {
+    plusRotation.value = withSequence(
+      withTiming(90, { duration: 100 }),
+      withTiming(0, { duration: 100 }),
+    );
+
+    floatY.value = 0;
+    floatOpacity.value = 1;
+    floatY.value = withTiming(-60, { duration: 280 });
+    floatOpacity.value = withTiming(0, { duration: 280 });
+
+    onAdd(item, 1);
+  };
 
   return (
     <Pressable
       onPress={() => onPress(item)}
       onPressIn={() => {
-        scale.value = withSpring(0.98, { damping: 14, stiffness: 220 });
+        cardScale.value = withSpring(0.97, { stiffness: 300, damping: 18 });
       }}
       onPressOut={() => {
-        scale.value = withSpring(1, { damping: 10, stiffness: 180 });
+        cardScale.value = withSpring(1, { stiffness: 220, damping: 16 });
       }}
     >
       <Animated.View
         style={[
-          animatedStyle,
+          cardStyle,
           {
             shadowColor: '#1a1008',
             shadowOpacity: 0.06,
@@ -81,13 +109,32 @@ export function MenuItemCard({ item, onAdd, onPress }: MenuItemCardProps) {
             <Text className="text-[16px] font-bold text-brand-primary">
               ${item.price.toFixed(2)}
             </Text>
-            <Pressable
-              onPress={() => onAdd(item, 1)}
-              hitSlop={8}
-              className="h-9 w-9 rounded-full bg-brand-primary items-center justify-center"
-            >
-              <Ionicons name="add" size={20} color="#ffffff" />
-            </Pressable>
+            <View>
+              <Pressable
+                onPress={handlePlusPress}
+                hitSlop={8}
+                className="h-9 w-9 rounded-full bg-brand-primary items-center justify-center"
+              >
+                <Animated.View style={plusStyle}>
+                  <Ionicons name="add" size={20} color="#ffffff" />
+                </Animated.View>
+              </Pressable>
+              <Animated.View
+                pointerEvents="none"
+                style={[
+                  floatStyle,
+                  {
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    alignItems: 'center',
+                  },
+                ]}
+              >
+                <Text className="text-[22px]">{item.emoji}</Text>
+              </Animated.View>
+            </View>
           </View>
         </View>
       </Animated.View>
