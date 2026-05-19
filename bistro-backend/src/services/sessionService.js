@@ -34,6 +34,16 @@ export function updateCart(sessionId, cart) {
   return session.cart;
 }
 
+export function resetSession(sessionId) {
+  const session = sessions.get(sessionId);
+  if (session) {
+    session.history = [];
+    session.cart = [];
+    session.updatedAt = Date.now();
+  }
+  return session;
+}
+
 export function clearOldSessions() {
   const cutoff = Date.now() - SESSION_TTL_MS;
   let removed = 0;

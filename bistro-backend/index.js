@@ -1,11 +1,13 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import corsMiddleware from './src/middleware/cors.js';
 import errorHandler from './src/middleware/errorHandler.js';
 import menuRouter from './src/routes/menu.js';
 import chatRouter from './src/routes/chat.js';
 import cartRouter from './src/routes/cart.js';
+import sessionRouter from './src/routes/session.js';
 import { clearOldSessions } from './src/services/sessionService.js';
 
 dotenv.config();
@@ -15,6 +17,10 @@ const PORT = process.env.PORT || 3001;
 
 app.use(corsMiddleware);
 app.use(express.json());
+
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan(':method :url :status :response-time ms'));
+}
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -37,6 +43,7 @@ const chatLimiter = rateLimit({
 app.use('/api/menu', menuRouter);
 app.use('/api/chat', chatLimiter, chatRouter);
 app.use('/api/cart', cartRouter);
+app.use('/api/session', sessionRouter);
 
 setInterval(() => {
   const removed = clearOldSessions();

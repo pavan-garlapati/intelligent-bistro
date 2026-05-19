@@ -11,17 +11,39 @@ import {
   applyActionToCart,
 } from '../services/sessionService.js';
 
+const MAX_MESSAGE_LENGTH = 500;
+
+function sanitizeMessage(text) {
+  return text.replace(/<[^>]*>/g, '').trim().slice(0, MAX_MESSAGE_LENGTH);
+}
+
+function isValidSessionId(sid) {
+  return (
+    typeof sid === 'string' &&
+    sid.length > 0 &&
+    sid.length <= 64 &&
+    /^[A-Za-z0-9_-]+$/.test(sid)
+  );
+}
+
 const router = Router();
 
 router.post('/', async (req, res, next) => {
   try {
     const { message, sessionId } = req.body || {};
 
-    if (!message || typeof message !== 'string' || !message.trim()) {
+    if (!message || typeof message !== 'string') {
       return res.status(400).json({ error: 'message is required' });
     }
-    if (!sessionId || typeof sessionId !== 'string') {
-      return res.status(400).json({ error: 'sessionId is required' });
+    if (!isValidSessionId(sessionId)) {
+      return res
+        .status(400)
+        .json({ error: 'sessionId must be alphanumeric (max 64 chars)' });
+    }
+
+    const sanitized = sanitizeMessage(message);
+    if (!sanitized) {
+      return res.status(400).json({ error: 'message is empty after sanitization' });
     }
 
     const menu = await loadMenu();
@@ -29,7 +51,7 @@ router.post('/', async (req, res, next) => {
 
     const priorHistory = session.history.slice();
     const aiResponse = await processMessage(
-      message,
+      sanitized,
       priorHistory,
       menu,
       session.cart,
@@ -45,7 +67,7 @@ router.post('/', async (req, res, next) => {
     }
 
     updateCart(sessionId, nextCart);
-    addMessage(sessionId, 'user', message);
+    addMessage(sessionId, 'user', sanitized);
     addMessage(sessionId, 'assistant', aiResponse.reply);
 
     res.json({

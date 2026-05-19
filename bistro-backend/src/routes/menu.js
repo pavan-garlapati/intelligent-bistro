@@ -1,18 +1,20 @@
 import { Router } from 'express';
-import { readFile } from 'fs/promises';
+import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MENU_PATH = join(__dirname, '..', 'data', 'menu.json');
 
-let menuCache = null;
+const MENU = JSON.parse(readFileSync(MENU_PATH, 'utf-8')).items;
+console.log(`Menu loaded: ${MENU.length} items`);
+
+export function getMenu() {
+  return MENU;
+}
 
 export async function loadMenu() {
-  if (menuCache) return menuCache;
-  const raw = await readFile(MENU_PATH, 'utf-8');
-  menuCache = JSON.parse(raw).items;
-  return menuCache;
+  return MENU;
 }
 
 function groupByCategory(items) {
