@@ -11,7 +11,7 @@ import { categoryBg } from './categoryColors';
 
 export interface MenuItemCardProps {
   item: MenuItem;
-  onAdd: (item: MenuItem) => void;
+  onAdd: (item: MenuItem, quantity: number) => void;
   onPress: (item: MenuItem) => void;
 }
 
@@ -82,7 +82,7 @@ export function MenuItemCard({ item, onAdd, onPress }: MenuItemCardProps) {
               ${item.price.toFixed(2)}
             </Text>
             <Pressable
-              onPress={() => onAdd(item)}
+              onPress={() => onAdd(item, 1)}
               hitSlop={8}
               className="h-9 w-9 rounded-full bg-brand-primary items-center justify-center"
             >
