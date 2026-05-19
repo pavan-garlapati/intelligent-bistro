@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert,
   FlatList,
@@ -31,6 +31,8 @@ import { VoiceOverlay } from '../../components/chat/VoiceOverlay';
 import { LoadingDots } from '../../components/ui/LoadingDots';
 import { useVoiceInput } from '../../hooks/useVoiceInput';
 import type { Message } from '../../types';
+
+const keyExtractMessage = (m: Message) => m.id;
 
 const DEFAULT_SUGGESTIONS = [
   "What's popular?",
@@ -218,6 +220,15 @@ export default function ChatScreen() {
     );
   };
 
+  const renderMessage = useCallback(
+    ({ item }: { item: Message }) => <MessageBubble message={item} />,
+    [],
+  );
+
+  const handleContentSizeChange = useCallback(() => {
+    listRef.current?.scrollToEnd({ animated: true });
+  }, []);
+
   const lastAssistant = [...messages]
     .reverse()
     .find((m) => m.role === 'assistant');
@@ -256,13 +267,11 @@ export default function ChatScreen() {
           <FlatList
             ref={listRef}
             data={messages}
-            keyExtractor={(m) => m.id}
-            renderItem={({ item }) => <MessageBubble message={item} />}
+            keyExtractor={keyExtractMessage}
+            renderItem={renderMessage}
             contentContainerStyle={{ padding: 16, paddingBottom: 8 }}
             showsVerticalScrollIndicator={false}
-            onContentSizeChange={() =>
-              listRef.current?.scrollToEnd({ animated: true })
-            }
+            onContentSizeChange={handleContentSizeChange}
             ListFooterComponent={
               isLoading ? (
                 <View className="items-start mb-3">

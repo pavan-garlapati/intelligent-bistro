@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import * as Haptics from 'expo-haptics';
 import {
   Pressable,
@@ -43,6 +43,8 @@ const CATEGORY_TO_KEY: Record<
 };
 
 const ALL_CATEGORIES: Category[] = ['Starters', 'Mains', 'Drinks', 'Desserts'];
+
+const ItemSeparator = () => <View className="h-3" />;
 
 function SkeletonCard() {
   const opacity = useSharedValue(0.4);
@@ -117,17 +119,42 @@ export default function MenuScreen() {
       .filter((s) => s.data.length > 0);
   }, [grouped, selectedPill, searchText]);
 
-  const handleAdd = (item: MenuItem, quantity: number) => {
-    addItemToCart({
-      itemId: item.id,
-      name: item.name,
-      price: item.price,
-      quantity,
-      emoji: item.emoji,
-    });
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-    showToast('Added to order', item.emoji);
-  };
+  const handleAdd = useCallback(
+    (item: MenuItem, quantity: number) => {
+      addItemToCart({
+        itemId: item.id,
+        name: item.name,
+        price: item.price,
+        quantity,
+        emoji: item.emoji,
+      });
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+      showToast('Added to order', item.emoji);
+    },
+    [addItemToCart, showToast],
+  );
+
+  const handleCardPress = useCallback((i: MenuItem) => {
+    setSheetItem(i);
+  }, []);
+
+  const renderMenuItem = useCallback(
+    ({ item }: { item: MenuItem }) => (
+      <MenuItemCard item={item} onAdd={handleAdd} onPress={handleCardPress} />
+    ),
+    [handleAdd, handleCardPress],
+  );
+
+  const renderSectionHeader = useCallback(
+    ({ section }: { section: { title: Category; data: MenuItem[] } }) => (
+      <View className="bg-brand-cream">
+        <CategoryHeader title={section.title} count={section.data.length} />
+      </View>
+    ),
+    [],
+  );
+
+  const keyExtractItem = useCallback((m: MenuItem) => m.id, []);
 
   const showSkeleton = isLoading && items.length === 0;
   const showError = !!error && items.length === 0;
@@ -240,22 +267,12 @@ export default function MenuScreen() {
       ) : (
         <SectionList
           sections={sections}
-          keyExtractor={(item) => item.id}
+          keyExtractor={keyExtractItem}
           stickySectionHeadersEnabled
           contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}
-          ItemSeparatorComponent={() => <View className="h-3" />}
-          renderSectionHeader={({ section }) => (
-            <View className="bg-brand-cream">
-              <CategoryHeader title={section.title} count={section.data.length} />
-            </View>
-          )}
-          renderItem={({ item }) => (
-            <MenuItemCard
-              item={item}
-              onAdd={handleAdd}
-              onPress={(i) => setSheetItem(i)}
-            />
-          )}
+          ItemSeparatorComponent={ItemSeparator}
+          renderSectionHeader={renderSectionHeader}
+          renderItem={renderMenuItem}
           refreshing={isLoading}
           onRefresh={fetchMenu}
           ListEmptyComponent={

@@ -3,9 +3,9 @@ import type {
   ChatResponse,
   GroupedMenu,
 } from '../types';
+import { API_BASE } from '../constants/config';
 
-const BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3001/api';
+const BASE_URL = API_BASE;
 
 export const NETWORK_ERROR_MESSAGE = 'No internet connection';
 
