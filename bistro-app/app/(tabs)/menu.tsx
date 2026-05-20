@@ -22,6 +22,7 @@ import Animated, {
 
 import { useMenuStore } from '../../store/menuStore';
 import { useCartStore } from '../../store/cartStore';
+import { addToCart as apiAddToCart } from '../../services/api';
 import { MenuItemCard } from '../../components/menu/MenuItemCard';
 import { CategoryHeader } from '../../components/menu/CategoryHeader';
 import { ItemDetailSheet } from '../../components/menu/ItemDetailSheet';
@@ -87,6 +88,7 @@ export default function MenuScreen() {
 
   const cartItems = useCartStore((s) => s.items);
   const addItemToCart = useCartStore((s) => s.addItem);
+  const sessionId = useCartStore((s) => s.sessionId);
 
   const [selectedPill, setSelectedPill] = useState<PillOption>('All');
   const [searchText, setSearchText] = useState('');
@@ -128,10 +130,11 @@ export default function MenuScreen() {
         quantity,
         emoji: item.emoji,
       });
+      apiAddToCart(sessionId, item.id, quantity).catch(() => {});
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
       showToast('Added to order', item.emoji);
     },
-    [addItemToCart, showToast],
+    [addItemToCart, showToast, sessionId],
   );
 
   const handleCardPress = useCallback((i: MenuItem) => {

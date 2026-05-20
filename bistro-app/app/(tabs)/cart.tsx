@@ -25,8 +25,10 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useCartStore } from '../../store/cartStore';
+import { useOrdersStore } from '../../store/ordersStore';
 import { QuantityStepper } from '../../components/ui/QuantityStepper';
 import {
+  clearCart as apiClearCart,
   removeFromCart as apiRemoveFromCart,
   updateCartItem as apiUpdateCartItem,
 } from '../../services/api';
@@ -218,6 +220,7 @@ export default function CartScreen() {
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
   const clearCart = useCartStore((s) => s.clearCart);
+  const addOrder = useOrdersStore((s) => s.addOrder);
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [isPlacing, setIsPlacing] = useState(false);
@@ -252,10 +255,18 @@ export default function CartScreen() {
   };
 
   const handlePlaceOrder = () => {
-    if (isPlacing) return;
+    if (isPlacing || items.length === 0) return;
     setIsPlacing(true);
     if (placeTimer.current) clearTimeout(placeTimer.current);
+    const snapshot = {
+      items: items.map((i) => ({ ...i })),
+      subtotal,
+      tax,
+      total,
+    };
     placeTimer.current = setTimeout(() => {
+      addOrder(snapshot);
+      apiClearCart(sessionId).catch(() => {});
       setIsPlacing(false);
       setShowSuccess(true);
       Haptics.notificationAsync(

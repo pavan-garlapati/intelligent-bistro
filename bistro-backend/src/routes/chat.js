@@ -9,6 +9,7 @@ import {
   addMessage,
   updateCart,
   applyActionToCart,
+  resetSession,
 } from '../services/sessionService.js';
 
 const MAX_MESSAGE_LENGTH = 500;
@@ -66,9 +67,15 @@ router.post('/', async (req, res, next) => {
       nextCart = applyActionToCart(nextCart, action, menuItem);
     }
 
-    updateCart(sessionId, nextCart);
-    addMessage(sessionId, 'user', sanitized);
-    addMessage(sessionId, 'assistant', aiResponse.reply);
+    const placedOrder = validatedActions.some((a) => a.type === 'place_order');
+
+    if (placedOrder) {
+      resetSession(sessionId);
+    } else {
+      updateCart(sessionId, nextCart);
+      addMessage(sessionId, 'user', sanitized);
+      addMessage(sessionId, 'assistant', aiResponse.reply);
+    }
 
     res.json({
       reply: aiResponse.reply,

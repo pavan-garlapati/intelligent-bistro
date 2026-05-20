@@ -38,7 +38,17 @@ export type ActionType =
   | 'remove_item'
   | 'update_qty'
   | 'clear_cart'
+  | 'place_order'
   | 'no_action';
+
+export interface Order {
+  id: string;
+  items: CartItem[];
+  subtotal: number;
+  tax: number;
+  total: number;
+  placedAt: number;
+}
 
 export interface Action {
   type: ActionType;

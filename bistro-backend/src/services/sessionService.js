@@ -103,6 +103,7 @@ export function applyActionToCart(cart, action, menuItem) {
       }
       return next;
     }
+    case 'place_order':
     case 'clear_cart':
       return [];
     case 'no_action':

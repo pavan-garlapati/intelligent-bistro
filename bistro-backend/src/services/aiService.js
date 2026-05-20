@@ -53,7 +53,7 @@ RESPONSE FORMAT — respond with ONLY valid JSON in this exact schema, no prose 
   "reply": "friendly conversational message to the user",
   "actions": [
     {
-      "type": "add_item" | "remove_item" | "update_qty" | "clear_cart" | "no_action",
+      "type": "add_item" | "remove_item" | "update_qty" | "clear_cart" | "place_order" | "no_action",
       "itemId": "menu-item-id",
       "quantity": 1,
       "reason": "brief reason"
@@ -65,7 +65,9 @@ RESPONSE FORMAT — respond with ONLY valid JSON in this exact schema, no prose 
 RULES:
 - The "actions" array can be empty for purely conversational responses.
 - For "add_item", "remove_item", or "update_qty", the "itemId" MUST exactly match an ID from the MENU above. Never invent IDs.
-- For "clear_cart" and "no_action", "itemId" and "quantity" may be omitted or null.
+- For "clear_cart", "place_order", and "no_action", "itemId" and "quantity" may be omitted or null.
+- When the user wants to place/submit/finalize/confirm their order ("place my order", "order it", "I'm done", "submit"), return a "place_order" action AND a confirming reply (e.g. "Your order has been placed!"). Do NOT also include add_item/remove_item actions in the same turn — confirm any pending changes first.
+- If the user asks to place an order but the CURRENT CART is empty, do NOT return a place_order action. Reply asking them to add something first.
 - Keep your "reply" field under 40 words. Be warm but efficient.
 - When the user says "make that two" or any similar follow-up, use the conversation history to determine which item they mean.
 - When asked "what's in my cart" (or similar), list the current cart items from the CURRENT CART state above.
@@ -167,6 +169,7 @@ export function validateAndEnrichActions(actions, menuData) {
     'remove_item',
     'update_qty',
     'clear_cart',
+    'place_order',
     'no_action',
   ]);
 
@@ -174,7 +177,11 @@ export function validateAndEnrichActions(actions, menuData) {
   for (const action of actions) {
     if (!action || !validTypes.has(action.type)) continue;
 
-    if (action.type === 'clear_cart' || action.type === 'no_action') {
+    if (
+      action.type === 'clear_cart' ||
+      action.type === 'place_order' ||
+      action.type === 'no_action'
+    ) {
       cleaned.push({
         type: action.type,
         reason: typeof action.reason === 'string' ? action.reason : '',

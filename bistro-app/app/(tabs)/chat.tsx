@@ -19,8 +19,10 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import * as Haptics from 'expo-haptics';
 import { useChatStore } from '../../store/chatStore';
 import { useCartStore } from '../../store/cartStore';
+import { useOrdersStore } from '../../store/ordersStore';
 import {
   NETWORK_ERROR_MESSAGE,
   sendChatMessage as apiSendChatMessage,
@@ -120,6 +122,7 @@ export default function ChatScreen() {
 
   const sessionId = useCartStore((s) => s.sessionId);
   const syncCart = useCartStore((s) => s.syncCart);
+  const addOrder = useOrdersStore((s) => s.addOrder);
 
   const [inputText, setInputText] = useState('');
   const [lastFailedMessage, setLastFailedMessage] = useState<string | null>(
@@ -155,8 +158,26 @@ export default function ChatScreen() {
     setInputText('');
     setLoading(true);
 
+    const cartBefore = useCartStore.getState();
+    const cartSnapshot = {
+      items: cartBefore.items.map((i) => ({ ...i })),
+      subtotal: cartBefore.subtotal,
+      tax: cartBefore.tax,
+      total: cartBefore.total,
+    };
+
     try {
       const res = await apiSendChatMessage(trimmed, sessionId);
+
+      const placedOrder = res.actions?.some((a) => a.type === 'place_order');
+      if (placedOrder && cartSnapshot.items.length > 0) {
+        addOrder(cartSnapshot);
+        Haptics.notificationAsync(
+          Haptics.NotificationFeedbackType.Success,
+        ).catch(() => {});
+        showToast('Order placed!', '🎉');
+      }
+
       addMessage({
         role: 'assistant',
         content: res.reply,

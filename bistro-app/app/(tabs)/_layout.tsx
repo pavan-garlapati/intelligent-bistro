@@ -31,10 +31,23 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="cart"
         options={{
-          title: 'Order',
+          title: 'Cart',
           tabBarIcon: ({ focused, color, size }) => (
             <Ionicons
               name={focused ? 'bag' : 'bag-outline'}
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="orders"
+        options={{
+          title: 'Orders',
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? 'receipt' : 'receipt-outline'}
               color={color}
               size={size}
             />
