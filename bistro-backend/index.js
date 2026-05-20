@@ -22,9 +22,12 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan(':method :url :status :response-time ms'));
 }
 
+const skipPreflight = (req) => req.method === 'OPTIONS';
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 200,
+  skip: skipPreflight,
 });
 app.use(limiter);
 
@@ -37,6 +40,7 @@ const chatLimiter = rateLimit({
   max: 30,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: skipPreflight,
   message: { error: 'Too many chat requests, please slow down.' },
 });
 

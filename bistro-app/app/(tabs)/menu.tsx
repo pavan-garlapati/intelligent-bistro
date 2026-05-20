@@ -96,10 +96,10 @@ export default function MenuScreen() {
   const { showToast } = useToast();
 
   useEffect(() => {
-    if (items.length === 0 && !isLoading) {
+    if (items.length === 0 && !isLoading && !error) {
       fetchMenu();
     }
-  }, [items.length, isLoading, fetchMenu]);
+  }, [items.length, isLoading, error, fetchMenu]);
 
   const cartCount = useMemo(
     () => cartItems.reduce((sum, i) => sum + i.quantity, 0),
