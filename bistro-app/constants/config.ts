@@ -4,7 +4,7 @@
 //
 // iOS Simulator and web can use http://localhost:3001 directly; Android emulator can use http://10.0.2.2:3001.
 // You can override this at runtime with EXPO_PUBLIC_API_URL=http://x.x.x.x:3001/api in a .env file.
-const LOCAL_IP = '192.168.1.x'; // ← REPLACE with your computer's local IP
+ const LOCAL_IP = '192.168.1.x'; // ← REPLACE with your computer's local IP
 
 export const API_BASE =
   process.env.EXPO_PUBLIC_API_URL ??

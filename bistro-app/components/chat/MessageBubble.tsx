@@ -1,5 +1,4 @@
 import { Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import Animated, { SlideInLeft, SlideInRight } from 'react-native-reanimated';
 import type { Action, Message } from '../../types';
 import { ActionConfirmCard, type ActionConfirmAction } from '../ui/ActionConfirmCard';
@@ -38,15 +37,6 @@ export function MessageBubble({ message }: MessageBubbleProps) {
       entering={Entering.duration(220)}
       className={`mb-3 ${isUser ? 'items-end' : 'items-start'}`}
     >
-      {isUser && message.isVoice && (
-        <View className="flex-row items-center bg-[#fbe7d8] px-2 py-0.5 rounded-full mb-1 mr-1">
-          <Ionicons name="mic" size={11} color="#b85c28" />
-          <Text className="text-[10px] text-brand-primary ml-1 font-semibold uppercase tracking-wide">
-            Voice
-          </Text>
-        </View>
-      )}
-
       <View
         className={
           isUser

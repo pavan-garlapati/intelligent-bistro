@@ -27,9 +27,7 @@ import {
 } from '../../services/api';
 import { useToast } from '../../components/ui/ToastProvider';
 import { MessageBubble } from '../../components/chat/MessageBubble';
-import { VoiceOverlay } from '../../components/chat/VoiceOverlay';
 import { LoadingDots } from '../../components/ui/LoadingDots';
-import { useVoiceInput } from '../../hooks/useVoiceInput';
 import type { Message } from '../../types';
 
 const keyExtractMessage = (m: Message) => m.id;
@@ -131,34 +129,15 @@ export default function ChatScreen() {
 
   const { showToast } = useToast();
 
-  const voice = useVoiceInput({
-    onTranscriptReady: (text) => {
-      sendMessage(text, true);
-    },
-  });
-
-  useEffect(() => {
-    if (!voice.error) return;
-    Alert.alert(
-      'Voice input unavailable',
-      `${voice.error}\n\nEnable microphone access for The Bistro in Settings, then try again.`,
-    );
-  }, [voice.error]);
-
   const hasText = inputText.trim().length > 0;
   const sendOpacity = useSharedValue(0);
-  const micOpacity = useSharedValue(1);
 
   useEffect(() => {
-    sendOpacity.value = withTiming(hasText ? 1 : 0, { duration: 160 });
-    micOpacity.value = withTiming(hasText ? 0 : 1, { duration: 160 });
-  }, [hasText, sendOpacity, micOpacity]);
+    sendOpacity.value = withTiming(hasText ? 1 : 0.4, { duration: 160 });
+  }, [hasText, sendOpacity]);
 
   const sendAnimStyle = useAnimatedStyle(() => ({
     opacity: sendOpacity.value,
-  }));
-  const micAnimStyle = useAnimatedStyle(() => ({
-    opacity: micOpacity.value,
   }));
 
   useEffect(() => {
@@ -168,11 +147,11 @@ export default function ChatScreen() {
     return () => clearTimeout(id);
   }, [messages.length, isLoading]);
 
-  const sendMessage = async (text: string, isVoice = false) => {
+  const sendMessage = async (text: string) => {
     const trimmed = text.trim();
     if (!trimmed || isLoading) return;
 
-    addMessage({ role: 'user', content: trimmed, isVoice });
+    addMessage({ role: 'user', content: trimmed });
     setInputText('');
     setLoading(true);
 
@@ -318,41 +297,17 @@ export default function ChatScreen() {
             />
           </View>
 
-          <View className="w-11 h-11 items-center justify-center">
-            <Animated.View
-              style={[micAnimStyle, { position: 'absolute' }]}
-              pointerEvents={hasText ? 'none' : 'auto'}
+          <Animated.View style={sendAnimStyle}>
+            <Pressable
+              onPress={() => sendMessage(inputText)}
+              disabled={!hasText || isLoading}
+              className="w-11 h-11 rounded-full bg-brand-primary items-center justify-center"
             >
-              <Pressable
-                onPress={voice.startRecording}
-                className="w-11 h-11 rounded-full bg-brand-surface items-center justify-center"
-              >
-                <Ionicons name="mic" size={20} color="#b85c28" />
-              </Pressable>
-            </Animated.View>
-
-            <Animated.View
-              style={[sendAnimStyle, { position: 'absolute' }]}
-              pointerEvents={hasText ? 'auto' : 'none'}
-            >
-              <Pressable
-                onPress={() => sendMessage(inputText)}
-                disabled={isLoading}
-                className="w-11 h-11 rounded-full bg-brand-primary items-center justify-center"
-              >
-                <Ionicons name="arrow-up" size={20} color="#ffffff" />
-              </Pressable>
-            </Animated.View>
-          </View>
+              <Ionicons name="arrow-up" size={20} color="#ffffff" />
+            </Pressable>
+          </Animated.View>
         </View>
       </KeyboardAvoidingView>
-
-      <VoiceOverlay
-        visible={voice.state !== 'idle'}
-        transcript={voice.transcript}
-        onStop={voice.stopRecording}
-        onCancel={voice.cancelRecording}
-      />
     </View>
   );
 }
